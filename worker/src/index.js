@@ -29,6 +29,8 @@ const HP_MAX_TEXT_LEN = 200;
 const HP_FEED_SCHEMA_VERSION = 1;
 // Utaemo のマスター曲データが使う標準ジャンル。これ以外の値は公開データに載せない。
 const HP_GENRES = ['J-POP', 'アニソン', 'ボカロ', 'アイドル曲', '洋楽', '演歌', 'その他'];
+// HPに公開してよい曲マーク(おはこ/お気に入り/練習中)。この順で保存する。タグ・メモは公開しない。
+const HP_MARKS = ['signature', 'favorite', 'learning'];
 // HP の読み込みコード(別オリジン)から認証情報なしで読む公開フィード専用。他のAPIには適用しない。
 const HP_FEED_CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -776,7 +778,7 @@ async function handleAdminStats(request, env) {
 // - 紐づけ(hp_links)は制作者(管理者)だけが作成・解除できる。
 // - 反映できるのは、紐づいた Utaemo 公開ページIDの本人(Google ログイン or 編集キー)だけ。
 //   リクエストに連携先IDは含めず、サーバーが streamer_id から連携先を引く(=他人のHPには書けない)。
-// - 公開データは許可リスト方式で作り直す。メモ・マーク・タグ・認証情報などは構造上、載らない。
+// - 公開データは許可リスト方式で作り直す。メモ・タグ・認証情報などは構造上、載らない(マークはおはこ/お気に入り/練習中のみ公開)。
 // - 反映は revision による楽観ロック付きの単一UPSERT。失敗・連打・同時更新でも前回の公開データは壊れない。
 // ---------------------------------------------------------------------------
 
@@ -824,7 +826,7 @@ function sanitizeHpText(value) {
 
 /**
  * クライアントから届いた曲配列を、HPに公開してよい形へ作り直す(許可リスト方式)。
- * 戻り値の曲は { t, a, y?, ty?, genres } だけ。それ以外のフィールドは捨てる。
+ * 戻り値の曲は { t, a, y?, ty?, genres, m? } だけ。それ以外のフィールドは捨てる。
  */
 function sanitizeHpSongs(input) {
   if (!Array.isArray(input)) return { ok: false, message: 'songs must be an array' };
@@ -857,6 +859,11 @@ function sanitizeHpSongs(input) {
       }
     }
     song.genres = genres;
+
+    if (Array.isArray(raw.m)) {
+      const marks = HP_MARKS.filter((m) => raw.m.includes(m));
+      if (marks.length) song.m = marks;
+    }
     songs.push(song);
   }
   return { ok: true, songs };
@@ -866,6 +873,7 @@ function hpSongSignature(song) {
   return JSON.stringify([
     song.t, song.a, song.y || '', song.ty || '',
     [...(song.genres || [])].sort(),
+    [...(song.m || [])].sort(),
   ]);
 }
 
