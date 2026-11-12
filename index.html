@@ -7940,8 +7940,8 @@ function hpContextKey() {
 
 function hpSongKey(s) { return s.a + '\u0001' + s.t; }
 
-// HPに渡す公開用データ。曲名・アーティスト名・検索用の読み・ジャンルだけ(許可リスト方式)。
-// 個人用のマーク(おはこ/練習中など)・タグ・追加日・下書き・認証情報は含めない。サーバー側でも同じ許可リストで再検証される。
+// HPに渡す公開用データ。曲名・アーティスト名・検索用の読み・ジャンル・マーク(おはこ/お気に入り/練習中)だけ(許可リスト方式)。
+// タグ・メモ・追加日・下書き・認証情報は含めない。サーバー側でも同じ許可リストで再検証される。
 function buildHpSongs() {
   const out = [];
   for (const s of selectedEditorSongs()) {
@@ -7949,13 +7949,15 @@ function buildHpSongs() {
     if (s.y) o.y = s.y;
     if (s.ty) o.ty = s.ty;
     o.genres = getSongGenres(s);
+    const m = normalizedMarks(songMeta[keyOf(s)]);
+    if (m.length) o.m = m;
     out.push(o);
   }
   return out;
 }
 
 function hpSongSignature(s) {
-  return JSON.stringify([s.t, s.a, s.y || '', s.ty || '', [...(s.genres || [])].sort()]);
+  return JSON.stringify([s.t, s.a, s.y || '', s.ty || '', [...(s.genres || [])].sort(), [...(s.m || [])].sort()]);
 }
 
 // 前回反映分(prev)と今回(next)の差分。曲キー(アーティスト+曲名)で突き合わせる(Worker 側と同じ規則)。
@@ -7982,6 +7984,9 @@ function hpChangeNote(prev, next) {
   const ng = (next.genres || []).join('・') || 'ジャンルなし';
   if (pg !== ng) parts.push('ジャンル：' + pg + ' → ' + ng);
   if ((prev.y || '') !== (next.y || '') || (prev.ty || '') !== (next.ty || '')) parts.push('読みを更新');
+  const pm = (prev.m || []).map(markLabel).join(' ') || 'なし';
+  const nm = (next.m || []).map(markLabel).join(' ') || 'なし';
+  if (pm !== nm) parts.push('ラベル：' + pm + ' → ' + nm);
   return parts.join(' / ');
 }
 
