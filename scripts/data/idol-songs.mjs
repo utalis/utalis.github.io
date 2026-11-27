@@ -21,6 +21,7 @@ export const IDOL_SONG_KEYS = new Set([
   "=LOVE\u0001ラブソングに襲われる",
   "=LOVE\u0001絶対アイドル辞めないで",
   "=LOVE\u0001あの子コンプレックス",
+  "=LOVE\u0001手遅れcaution",
   "板野友美\u00010.01",
   "いれいす\u0001イノチノウタ",
   "E-girls\u0001STRAWBERRY サディスティック",

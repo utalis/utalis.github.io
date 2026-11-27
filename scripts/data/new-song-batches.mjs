@@ -1,3 +1,5 @@
+import { EMOKARA_20261126 } from './emokara-2026-11-26.mjs';
+
 /**
  * UTAEMO 新着バッチ管理（エモカラ新着画面より手動転記）
  *
@@ -8,7 +10,7 @@
  */
 
 /** @type {string} 現在の新着バッチ ID */
-export const CURRENT_NEW_BATCH = 'batch-2026-emokara-04';
+export const CURRENT_NEW_BATCH = 'batch-2026-emokara-05';
 
 /**
  * @typedef {{ title: string, artist: string, titleNeedsReview?: boolean, note?: string }} BatchSongEntry
@@ -220,6 +222,12 @@ export const NEW_SONG_BATCHES = [
       { title: 'セーラー服と機関銃', artist: '橋本環奈' },
       { title: 'きっと大丈夫', artist: 'Little Glee Monster' },
     ],
+  },
+  {
+    id: 'batch-2026-emokara-05',
+    label: 'エモカラ新着（2026-11-26 真君リスト）',
+    source: 'notion-shinkun-r8.11.26',
+    songs: EMOKARA_20261126.map((s) => ({ title: s.t, artist: s.a })),
   },
 ];
 

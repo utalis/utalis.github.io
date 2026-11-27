@@ -18,7 +18,7 @@
 
 ```
 index.html（ビルダー）
-  ├─ MASTER_SONGS … 全楽曲カタログ（1,952 曲）
+  ├─ MASTER_SONGS … 全楽曲カタログ（2,120 曲）
   ├─ 曲選択 UI
   └─ viewer-template-b64 … 公開ページ HTML のテンプレート（Base64）
          │
@@ -124,8 +124,8 @@ artist + "\u0001" + title
 | 項目 | 値 |
 |---|---|
 | Git コミット | GitHub 上の `main` HEAD を参照（`baseline/BASELINE.json` の `gitCommit` は未固定） |
-| マスター楽曲数 | 1,952 曲（886 アーティスト） |
-| カタログ更新日 | 2026/7/28 |
+| マスター楽曲数 | 2,120 曲（939 アーティスト） |
+| カタログ更新日 | 2026/11/26 |
 | サンプル `hiro.html` | 14 曲（v1 形式のまま据え置き） |
 | 追加フィールド | `configVersion`, `songMeta`, `tagPresets`（すべて optional・既存6フィールドは不変） |
 
@@ -191,6 +191,7 @@ node scripts/test-api-phase4c.mjs
 | 2026-08-16 | Phase 4C-3/4C-4: ビルダーに Google ログイン・公開ページID取得（claim）・「公開する」API接続を追加。API: `https://utaeru-api.manabit.workers.dev`。公開ページ（viewer-template / `hiro.html`）は未変更 |
 | 2026-10-19 | 「HPに反映する」(HP連携)を追加。利用者が自分の好きなタイミングで、連携済みHPに曲リストを反映できる(差分確認→反映)。連携は制作者が1回だけ設定する任意機能で、未連携の利用者は従来どおり。HPが読む公開データは曲名・アーティスト・読み・ジャンルのみで、編集データとは別管理。Worker に D1 テーブル `hp_links` / `hp_published` と API を追加（`worker/migrations/003_hp_sync.sql`）。既存の公開API・builder-config・曲データ形式は無変更。手順: `docs/hp-sync-setup.md` |
 | 2026-11-11 | 「HPに反映する」で、曲ラベル(⭐おはこ/❤️お気に入り/🔰練習中)もHPへ渡せるように。公開データは曲名・アーティスト・読み・ジャンル・ラベルのみ(タグ・メモ等は従来どおり載らない)。Worker の許可リストに `m` を追加(後方互換、フィード schemaVersion は 1 のまま)。**Worker の再デプロイが必要**(先にWorker→その後に利用者が「HPに反映する」)。 |
+| 2026-11-27 | 真君の楽曲リスト（R8.11.26）からエモカラ新着53曲を追加。アーティスト読み・曲名読み・ジャンルも登録。現行新着バッチは `batch-2026-emokara-05`。 |
 
 ## 機能追加時のガイドライン
 
@@ -202,4 +203,4 @@ node scripts/test-api-phase4c.mjs
 
 ## データ提供元
 
-Mirrativ（ミラティブ）内カラオケアプリ「エモカラ」の楽曲一覧（2026/7/28 時点のカタログ）をもとにしています。
+Mirrativ（ミラティブ）内カラオケアプリ「エモカラ」の楽曲一覧（2026/11/26 時点のカタログ、真君の楽曲リスト）をもとにしています。

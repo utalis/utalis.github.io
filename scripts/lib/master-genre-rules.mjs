@@ -11,6 +11,7 @@ import { ANIME_VERIFIED_PHASE4, GENRE_CORRECTIONS_PHASE4 } from '../data/anime-v
 import { GENRE_VERIFIED_PHASE5, GENRE_CORRECTIONS_PHASE5 } from '../data/genre-verified-phase5.mjs';
 
 import { IDOL_SONG_KEYS } from '../data/idol-songs.mjs';
+import { GENRE_BY_SONG_KEY } from '../data/genre-by-song-key.mjs';
 
 export const MASTER_GENRE_LABELS = ['J-POP', 'アニソン', 'ボカロ', 'アイドル曲', '洋楽', '演歌', 'その他'];
 
@@ -81,6 +82,7 @@ export const WESTERN_ARTISTS = new Set([
   'BIGBANG',
   'WIZ KHALIFA(Feat.CHARLIE PUTH)',
   'Alan Walker',
+  'MARIAH CAREY',
 ]);
 
 export const ENKA_ARTISTS = new Set([
@@ -197,6 +199,12 @@ export const VERIFIED_GENRES_BY_ID = {
   1441: ['J-POP', 'アニソン'],
 };
 
+function getVerifiedGenres(song) {
+  const keyed = song && GENRE_BY_SONG_KEY[song.a + '\u0001' + song.t];
+  if (keyed) return normalizeGenreList(keyed);
+  return getVerifiedGenresById(song.id);
+}
+
 function getVerifiedGenresById(id) {
   if (GENRE_CORRECTIONS_PHASE5[id]) {
     return normalizeGenreList(GENRE_CORRECTIONS_PHASE5[id].genres);
@@ -264,7 +272,7 @@ export function isExcludedFromJPop(song) {
 
 /** Phase 1: アニソン・ボカロ */
 export function classifyBaseGenres(song) {
-  const verified = getVerifiedGenresById(song.id);
+  const verified = getVerifiedGenres(song);
   if (verified) return verified;
 
   const genres = [];
@@ -296,7 +304,7 @@ export function classifyBaseGenres(song) {
 
 /** Phase 2: 未分類の一般邦楽へ J-POP を付与 */
 export function enrichWithJPop(song, genres) {
-  const verified = getVerifiedGenresById(song.id);
+  const verified = getVerifiedGenres(song);
   if (verified) return verified;
 
   if (genres.some((g) => g === '洋楽' || g === '演歌' || g === 'その他')) {
